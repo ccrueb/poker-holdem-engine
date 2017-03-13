@@ -14,17 +14,17 @@ const gameSchema = require('./demo-game-schema');
 const chartSchema = require('./demo-chart-schema');
 
 const engine = require('./index');
-
+const router = require('./router');
 
 function connect(connectionString) {
-  return new Promise(function(res, rej){
+  return new Promise(function (res, rej) {
     mongoose.connect(connectionString);
-    mongoose.connection.on('error', function(err){
+    mongoose.connection.on('error', function (err) {
       console.log(chalk.bold.red('Thread cant connect to mongo:'), err.message);
       console.log(chalk.bold.red('>'));
       rej(err);
     });
-    mongoose.connection.once('open', function() {
+    mongoose.connection.once('open', function () {
       res();
     });
   })
@@ -32,18 +32,18 @@ function connect(connectionString) {
 
 
 connect(config.mongoUri)
-  .then(function() {
+  .then(function () {
 
     console.log(chalk.bold.green('Connected to mongoDB'));
 
 
     const Game = mongoose.model('game', gameSchema);
 
-    function saveUpdates(data, done){
-      [,data.tournamentId, data.gameId, data.handId] = data.handId.match(/^[\d]+_([a-z,-\d]+)_([\d]+)-([\d]+)$/i);
+    function saveUpdates(data, done) {
+      [, data.tournamentId, data.gameId, data.handId] = data.handId.match(/^[\d]+_([a-z,-\d]+)_([\d]+)-([\d]+)$/i);
       let entry = new Game(data);
-      entry.save(function(err, savedData){
-        if(err){
+      entry.save(function (err, savedData) {
+        if (err) {
           console.log(chalk.bold.red(`An error occurred while saving ${data.type} updates.`));
           console.log(err.message);
         }
@@ -54,10 +54,10 @@ connect(config.mongoUri)
 
     const Chart = mongoose.model('chart', chartSchema);
 
-    function saveChart(data, done){
+    function saveChart(data, done) {
       let entry = new Chart(data);
-      entry.save(function(err, savedData){
-        if(err){
+      entry.save(function (err, savedData) {
+        if (err) {
           console.log(chalk.bold.red(`An error occurred while saving ${data.type} updates.`));
           console.log(err.message);
         }
@@ -67,15 +67,15 @@ connect(config.mongoUri)
 
 
 
-    engine.on('tournament:aborted', function() {
+    engine.on('tournament:aborted', function () {
       console.log(chalk.bold.red('Tournament aborted.'));
     });
 
-    engine.on('tournament:completed', function() {
+    engine.on('tournament:completed', function () {
       console.log(chalk.bold.gray('Tournament completed.'));
     });
 
-    engine.on('gamestate:updated', function(data, done) {
+    engine.on('gamestate:updated', function (data, done) {
       if (data.type != 'points')
         return void saveUpdates(data, done);
 
@@ -89,9 +89,9 @@ connect(config.mongoUri)
     const tournamentID = config.tournamentId;
     const players = config.players;
 
-    players.forEach(function(player) {
+    players.forEach(function (player) {
       const port = player.serviceUrl.match(/:([\d]{4})\/$/)[1];
-      const child = exec('node ./index.js', { cwd: `./demo-players/${player.name}/`, env: { PORT: port } }, function(err, stdout, stderr) {
+      const child = exec('node ./index.js', { cwd: `./demo-players/${player.name}/`, env: { PORT: port } }, function (err, stdout, stderr) {
         if (err) {
           console.log(chalk.bold.red('An error occurred while trying to open child process'), err);
         }
@@ -103,4 +103,8 @@ connect(config.mongoUri)
     console.log(chalk.bold.green('Ready to start a local tournament.'))
     engine.start(tournamentID, players);
 
+
+    //Router code
+    router.start(engine);
+    
   });

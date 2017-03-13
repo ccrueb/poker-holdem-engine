@@ -273,6 +273,81 @@ const actions = {
 
   },
 
+  /**
+   * @function
+   * @name getGs
+   * @desc
+   *  Prepare the gamestate model with the only information
+   *  each player should know, then returns object
+   *
+   * @param {Object} gs:
+   *  the gamestate object
+   *
+   * @returns {Object} modified gamestate object
+   */
+  getGs(gs){
+
+    const state = Object.create(null);
+
+    // unique id of the current tournament
+    state.tournamentId = gs.tournamentId;
+
+    // initial amount of chips available to each player
+    state.buyin = config.BUYIN;
+
+    // game number of the current tournament
+    state.game = gs.gameProgressiveId;
+
+    // hand number of the current game
+    state.hand = gs.handProgressiveId;
+
+    // count the number of time
+    // that players had already have the possibility to bet in the current session
+    state.spinCount = gs.spinCount;
+
+    // value of the small blinds
+    // ... big blind is always twice
+    state.sb = gs.sb;
+
+    // value of the pot, and eventually sidepot.
+    // are updated after each bet
+    state.pot = gs.pot;
+    state.sidepots = gs.sidepots;
+
+    // list of the community cards on the table
+    // ... everyone is able to access this same list
+    state.commonCards = gs.commonCards;
+
+    // index of the player with the dealer button
+    state.db = gs.dealerButtonIndex;
+
+    // amount of chips the current player must bet in order to remain in the game;
+    // it depends by how much he bet previously
+    state.callAmount = Math.max(gs.callAmount - this.chipsBet, 0);
+
+    // minimum amount the player has to bet
+    // in case he want to raise the call amount for the other players
+    state.minimumRaiseAmount = state.callAmount + (gs.lastRaiseAmount || 2 * gs.sb);
+
+    // the list of the players...
+    // make sure that the current players can see only his cards
+    state.players = gs.players.map(function(player) {
+      const cleanPlayer = {
+        id: player.id, name: player.name, status: player.status, chips: player.chips, chipsBet: player.chipsBet
+      };
+      if (this.id !== player.id){
+        return cleanPlayer;
+      }
+      cleanPlayer.cards = player.cards;
+      return cleanPlayer;
+    }, this);
+
+    // index of the player 'this' in the players array
+    state.me = gs.players.findIndex(player => player.id == this.id);
+
+    return state;
+  },
+
 
   /**
    * @function

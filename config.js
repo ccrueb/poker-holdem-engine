@@ -5,7 +5,7 @@ const config = {
 
   // configure the logger level;
   // one between { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
-  LOG_LEVEL: 'debug',
+  LOG_LEVEL: 'error',
 
   // time (expressed in ms) to wait after an hand ends,
   // before a new one can start
