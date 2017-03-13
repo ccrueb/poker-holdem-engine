@@ -3,8 +3,8 @@ exports = module.exports = {
   mongoUri: 'mongodb://localhost:27017/store',
   tournamentId: '574e653bbebd5a20064d08fb',
   players: [{
-    id: 'arale-id',
-    name: 'arale',
+    id: 'cal-id',
+    name: 'cal',
     serviceUrl: 'http://127.0.0.1:8080/'
   }, {
     id: 'bender-id',
