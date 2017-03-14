@@ -13,7 +13,6 @@ var MatchMaker = require('./matchMaker');
 // TODO: This event should be used to reply to all requests in request-queue
 // I did not know this existed
 engine.on('gamestate:updated', function (data, done) {
-  console.log('Game state updated')
   done();
 });
 

@@ -207,9 +207,9 @@ const gamestate = Object.create(EventEmitter.prototype, {
    * @returns void
    */
   addRequest: {
-    value: function(req, res, tournamentId, playerId){
+    value: function(req, res){
 
-      const gs = this[tournaments_].get(tournamentId);
+      const gs = this[tournaments_].get(req.params.gameId);
 
 
       if (gs == undefined) {
@@ -219,7 +219,7 @@ const gamestate = Object.create(EventEmitter.prototype, {
       } else {
 
       //Pipe information to gamestate
-      gs.requests.set(playerId, {req: req, res: res});
+      gs.requests.set(req.params.playerId, {req: req, res: res});
 
       }
 
