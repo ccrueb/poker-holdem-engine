@@ -9,12 +9,12 @@ const exec = require('child_process').exec;
 const chalk = require('chalk');
 const mongoose = require('mongoose');
 
-const config = require('./demo-config');
 const gameSchema = require('./demo-game-schema');
 const chartSchema = require('./demo-chart-schema');
 
 const engine = require('./index');
 const router = require('./router');
+var MatchMaker = require('./matchMaker');
 
 function connect(connectionString) {
   return new Promise(function (res, rej) {
@@ -31,7 +31,7 @@ function connect(connectionString) {
 }
 
 
-connect(config.mongoUri)
+connect('mongodb://localhost:27017/store')
   .then(function () {
 
     console.log(chalk.bold.green('Connected to mongoDB'));
@@ -82,29 +82,18 @@ connect(config.mongoUri)
       saveChart(data, done);
     });
 
+   
+    //Start router
+    router.start(engine, new MatchMaker(engine));
 
-
-
-
-    const tournamentID = config.tournamentId;
-    const players = config.players;
-
-    players.forEach(function (player) {
-      const port = player.serviceUrl.match(/:([\d]{4})\/$/)[1];
-      const child = exec('node ./index.js', { cwd: `./demo-players/${player.name}/`, env: { PORT: port } }, function (err, stdout, stderr) {
+    //Put 3 demo players on seperate processes that send requests to port 9000
+    for (var i = 0; i < 3; i++) {
+      const child = exec('node ./index.js', { cwd: `./demo-players/external/`}, function (err, stdout, stderr) {
         if (err) {
           console.log(chalk.bold.red('An error occurred while trying to open child process'), err);
         }
       });
       child.stdout.on('data', data => console.log(chalk.bold.gray(`${player.name}'s stdout:`), data));
       child.stderr.on('data', data => console.log(chalk.bold.red(`${player.name}'s stderr:`), data));
-    });
-
-    console.log(chalk.bold.green('Ready to start a local tournament.'))
-    engine.start(tournamentID, players);
-
-
-    //Router code
-    router.start(engine);
-    
+    };
   });

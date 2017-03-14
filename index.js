@@ -209,20 +209,21 @@ const gamestate = Object.create(EventEmitter.prototype, {
   addRequest: {
     value: function(req, res, tournamentId, playerId){
 
-      //Find correct gs object
       const gs = this[tournaments_].get(tournamentId);
 
 
-      if (gs == null) {
+      if (gs == undefined) {
         
         //No game found at this id
         res.send("no game found");
-      }
+      } else {
 
       //Pipe information to gamestate
-      console.log(playerId)  
       gs.requests.set(playerId, {req: req, res: res});
-      console.log(gs.requests);
+
+      }
+
+      
     }
   },
 
