@@ -14,10 +14,9 @@ request('http://127.0.0.1:9000/join/' + id, function (error, response, body) {
     if (!error) {
         gameId = body;
 
-        //Wait 3 seconds before playing
-        setTimeout(function () {
-            update();
-        }, 3000);
+        //This could cause a potential race condition where the gs on the server has
+        //not been created yet.
+        update();
     }
 });
 

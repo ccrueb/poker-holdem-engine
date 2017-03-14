@@ -35,7 +35,7 @@ const asyncFrom = require('./lib/loop-from-async');
 exports = module.exports = function* betLoop(gs) {
 
   logger.info('Hand %d/%d, starting betting session', gs.gameProgressiveId, gs.handProgressiveId, { tag: gs.handUniqueId });
-
+  requestQueue.sendResponses(gs);
 
   const deck_ = Symbol.for('cards-deck');
   const hasBB_ = Symbol.for('has-big-blind');
