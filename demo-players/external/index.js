@@ -23,8 +23,12 @@ request('http://127.0.0.1:9000/join/' + id, function (error, response, body) {
 
 // Play game - call/fold every hand
 var play = function() {
+
+    console.log("requesting game state");
     request('http://127.0.0.1:9000/game/' + gameId + '/' + id, function (error, response, body) {
   if(!error) {
+    console.log("game state received");
+      
       play();
   }
     })
