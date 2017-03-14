@@ -9,7 +9,6 @@ const app = express();
 const server = http.Server(app);
 const port = 9000;
 
-
 exports = module.exports = {
     start: function (engine, matchMaker) {
         app.use(bodyParser.json());
@@ -31,7 +30,3 @@ exports = module.exports = {
         });
     }
 }
-
-
-
-
